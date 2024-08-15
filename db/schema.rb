@@ -10,9 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_08_15_135519) do
+ActiveRecord::Schema[7.1].define(version: 2024_08_15_154336) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "customers", force: :cascade do |t|
+    t.string "name", null: false, comment: "User first name"
+    t.string "surname", null: false, comment: "User last name"
+    t.bigint "created_by_id", null: false, comment: "This references the user which created the customer"
+    t.bigint "last_modified_by_id", null: false, comment: "This references the user who last modified the customer's data"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_by_id"], name: "index_customers_on_created_by_id"
+    t.index ["last_modified_by_id"], name: "index_customers_on_last_modified_by_id"
+    t.index ["name", "surname"], name: "index_customers_on_name_and_surname", unique: true
+  end
 
   create_table "oauth_access_tokens", force: :cascade do |t|
     t.bigint "resource_owner_id"
@@ -55,5 +67,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_15_135519) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "customers", "users", column: "created_by_id"
+  add_foreign_key "customers", "users", column: "last_modified_by_id"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
 end
