@@ -53,6 +53,8 @@ group :development, :test do
   gem 'rubocop-performance', require: false # Write code that's more performant
   gem 'rubocop-rails', require: false # Automate usage of best Rails practices
   gem 'rubocop-rspec', require: false # Code style checking for RSpec files.
+  gem 'rubocop-factory_bot', require: false # Code style checking for factory_bot files
+  gem 'rubocop-rspec_rails', require: false # RSpec Rails-specific analysis for one's projects
   gem 'strong_migrations'  # Catch unsafe migrations in development
 end
 
@@ -63,6 +65,7 @@ group :development do
   gem 'flog', require: false # Flog reports the most tortured code in an easy to read pain report
 
   gem 'bullet', '~> 7.2' # help to kill N+1 queries and unused eager loading.
+  gem 'brakeman', require: false # checks for security vulnerabilities.
   # Add speed badges [https://github.com/MiniProfiler/rack-mini-profiler]
   # gem "rack-mini-profiler"
 

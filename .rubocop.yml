@@ -1,0 +1,26 @@
+# Self adds readability
+Style/RedundantSelf:
+  Enabled: false
+
+# Keep extra line detected around block body for better readability
+Style/EmptyLinesAroundBlockBody:
+  Enabled: false
+
+# A line with 80 characters length is generally too small
+Metrics/LineLength:
+  Max: 120
+
+Layout/IndentationConsistency:
+  EnforcedStyle: indented_internal_methods
+
+require:
+  - rubocop-rspec
+  - rubocop-performance
+  - rubocop-rails
+  - rubocop-factory_bot
+
+### Rspec Cops
+
+# This cop doesn't seem to add much value, hence disabling the same
+RSpec/ExampleLength:
+  Enabled: false
