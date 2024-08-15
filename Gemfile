@@ -50,6 +50,7 @@ group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem 'debug', platforms: %i[mri windows]
   gem 'factory_bot_rails' # DSL for defining and using factories
+  gem 'pry-byebug', '~> 3.10', '>= 3.10.1' # Useful for debugging purposes
   gem 'rspec-rails' # For Automated tests
   gem 'rubocop', require: false # Ruby code style checking and code formatting tool.
   gem 'rubocop-factory_bot', require: false # Code style checking for factory_bot files
@@ -58,7 +59,6 @@ group :development, :test do
   gem 'rubocop-rspec', require: false # Code style checking for RSpec files.
   gem 'rubocop-rspec_rails', require: false # RSpec Rails-specific analysis for one's projects
   gem 'strong_migrations' # Catch unsafe migrations in development
-  gem 'pry-byebug', '~> 3.10', '>= 3.10.1' # Useful for debugging purposes
 end
 
 group :development do
@@ -76,4 +76,4 @@ group :development do
   # gem "spring"
 end
 
-gem "devise", "~> 4.9"
+gem 'devise', '~> 4.9'
