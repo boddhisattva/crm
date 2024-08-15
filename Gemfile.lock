@@ -104,6 +104,8 @@ GEM
       responders
       warden (~> 1.2.3)
     diff-lcs (1.5.1)
+    doorkeeper (5.7.1)
+      railties (>= 5)
     drb (2.2.1)
     erubi (1.13.0)
     factory_bot (6.4.6)
@@ -341,6 +343,7 @@ DEPENDENCIES
   bullet (~> 7.2)
   debug
   devise (~> 4.9)
+  doorkeeper (~> 5.7)
   factory_bot_rails
   fasterer
   flog

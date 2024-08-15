@@ -10,6 +10,8 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
+Doorkeeper::Application.create!(name: 'CRM App', redirect_uri: '', scopes: '') if Doorkeeper::Application.count.zero?
+
 User.first_or_create(email: 'user1@example.com',
                      password: 'passwd',
                      password_confirmation: 'passwd',

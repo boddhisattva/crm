@@ -33,3 +33,7 @@
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+
+# Other new files ignored
+.ruby-gemset
+.DS_Store
