@@ -47,12 +47,22 @@ gem "bootsnap", require: false
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ]
+  gem 'rspec-rails' # For Automated tests
+  gem 'factory_bot_rails' # DSL for defining and using factories
+  gem 'rubocop', require: false #Ruby code style checking and code formatting tool.
+  gem 'rubocop-performance', require: false # Write code that's more performant
+  gem 'rubocop-rails', require: false # Automate usage of best Rails practices
+  gem 'rubocop-rspec', require: false # Code style checking for RSpec files.
+  gem 'strong_migrations'  # Catch unsafe migrations in development
 end
 
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+  gem 'fasterer' # Write more performant code
+  gem 'flog', require: false # Flog reports the most tortured code in an easy to read pain report
 
+  gem 'bullet', '~> 7.2' # help to kill N+1 queries and unused eager loading.
   # Add speed badges [https://github.com/MiniProfiler/rack-mini-profiler]
   # gem "rack-mini-profiler"
 
