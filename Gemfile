@@ -58,6 +58,7 @@ group :development, :test do
   gem 'rubocop-rspec', require: false # Code style checking for RSpec files.
   gem 'rubocop-rspec_rails', require: false # RSpec Rails-specific analysis for one's projects
   gem 'strong_migrations' # Catch unsafe migrations in development
+  gem 'pry-byebug', '~> 3.10', '>= 3.10.1' # Useful for debugging purposes
 end
 
 group :development do
