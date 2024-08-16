@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :customer do
-    name { "first name" }
-    surname { "last name" }
+    sequence(:name) { |n| "person#{n}" }
+    sequence(:surname) { |n| "person#{n}_surname" }
     created_by { create(:user) }
     last_modified_by { created_by }
   end
