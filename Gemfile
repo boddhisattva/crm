@@ -48,6 +48,7 @@ gem 'bootsnap', require: false
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
+  gem 'bullet', '~> 7.2' # help to kill N+1 queries and unused eager loading.
   gem 'debug', platforms: %i[mri windows]
   gem 'factory_bot_rails' # DSL for defining and using factories
   gem 'pry-byebug', '~> 3.10', '>= 3.10.1' # Useful for debugging purposes
@@ -58,6 +59,7 @@ group :development, :test do
   gem 'rubocop-rails', require: false # Automate usage of best Rails practices
   gem 'rubocop-rspec', require: false # Code style checking for RSpec files.
   gem 'rubocop-rspec_rails', require: false # RSpec Rails-specific analysis for one's projects
+  gem 'shoulda-matchers' # Simple One-Liner Tests for Rails
   gem 'strong_migrations' # Catch unsafe migrations in development
 end
 
@@ -68,7 +70,7 @@ group :development do
   gem 'web-console'
 
   gem 'brakeman', require: false # checks for security vulnerabilities.
-  gem 'bullet', '~> 7.2' # help to kill N+1 queries and unused eager loading.
+
   # Add speed badges [https://github.com/MiniProfiler/rack-mini-profiler]
   # gem "rack-mini-profiler"
 
@@ -76,6 +78,12 @@ group :development do
   # gem "spring"
 end
 
-gem 'devise', '~> 4.9'
+gem 'devise', '~> 4.9' # Flexible authentication solution for Rails with Warden
 
-gem 'doorkeeper', '~> 5.7'
+gem 'doorkeeper', '~> 5.7' # OAuth 2 provider for Rails and Grape
+
+gem 'grape_on_rails_routes', '~> 0.3.2' # View routes for all Grape API's mounted on Rails
+
+gem 'grape', '~> 2.1' # A simple Ruby framework for building REST-like APIs.
+
+gem 'grape-entity', '~> 1.0' # A simple facade for managing the relationship between your model and API

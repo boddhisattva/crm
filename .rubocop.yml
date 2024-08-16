@@ -34,3 +34,6 @@ require:
 # This cop doesn't seem to add much value, hence disabling the same
 RSpec/ExampleLength:
   Enabled: false
+
+RSpec/MultipleExpectations:
+  Max: 10
