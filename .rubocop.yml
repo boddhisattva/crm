@@ -40,3 +40,6 @@ RSpec/MultipleExpectations:
 
 Metrics/MethodLength:
   Max: 30
+
+RSpec/NestedGroups:
+  Max: 4
