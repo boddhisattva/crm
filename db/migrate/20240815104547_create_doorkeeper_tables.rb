@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 class CreateDoorkeeperTables < ActiveRecord::Migration[7.1]
-  # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+  # rubocop:disable Metrics/AbcSize
   def change
-    # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
+    # rubocop:enable Metrics/AbcSize
     create_table :oauth_applications do |t|
       t.string  :name,    null: false
       t.string  :uid,     null: false
