@@ -7,7 +7,7 @@ RSpec.describe 'Customers API specs', type: :request do
     let(:customer) { create(:customer) }
     let(:user1) { customer.created_by }
 
-    context 'when authorized' do # TODO: update this later
+    context 'when authorized' do
       let(:other_customer) { create(:customer, created_by: customer.created_by) }
       let(:application) { create(:application) }
       let(:token) { create :access_token, application:, resource_owner_id: user1.id }

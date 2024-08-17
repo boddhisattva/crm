@@ -40,4 +40,3 @@ RSpec/MultipleExpectations:
 
 Metrics/MethodLength:
   Max: 30
-   # Default: 10

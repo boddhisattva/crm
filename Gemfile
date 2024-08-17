@@ -81,3 +81,5 @@ end
 gem 'devise', '~> 4.9' # Flexible authentication solution for Rails with Warden
 
 gem 'doorkeeper', '~> 5.7' # OAuth 2 provider for Rails and Grape
+
+gem 'will_paginate', '~> 4.0' # Adds Pagination capabilities
