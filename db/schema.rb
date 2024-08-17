@@ -62,7 +62,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_15_154336) do
     t.datetime "remember_created_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "role", default: 0
+    t.integer "role", default: 0, comment: "Useful to have different role types like admin etc.,"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
