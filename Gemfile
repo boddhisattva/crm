@@ -81,9 +81,3 @@ end
 gem 'devise', '~> 4.9' # Flexible authentication solution for Rails with Warden
 
 gem 'doorkeeper', '~> 5.7' # OAuth 2 provider for Rails and Grape
-
-gem 'grape_on_rails_routes', '~> 0.3.2' # View routes for all Grape API's mounted on Rails
-
-gem 'grape', '~> 2.1' # A simple Ruby framework for building REST-like APIs.
-
-gem 'grape-entity', '~> 1.0' # A simple facade for managing the relationship between your model and API
