@@ -23,7 +23,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_15_154336) do
     t.datetime "updated_at", null: false
     t.index ["created_by_id"], name: "index_customers_on_created_by_id"
     t.index ["last_modified_by_id"], name: "index_customers_on_last_modified_by_id"
-    t.index ["name", "surname"], name: "index_customers_on_name_and_surname", unique: true
+    t.index ["name", "surname", "created_by_id"], name: "index_customers_on_name_and_surname_and_created_by_id", unique: true
   end
 
   create_table "oauth_access_tokens", force: :cascade do |t|

@@ -9,7 +9,7 @@ RSpec.describe 'User Registration API specs', type: :request do
 
     context 'when valid params are passed as part of the request' do
       let(:application) { create(:application) }
-      let(:params) do
+      let(:signup_params) do
         {
           'email': 'user2@example.com',
           'password': 'dummy_passwd',
@@ -18,7 +18,7 @@ RSpec.describe 'User Registration API specs', type: :request do
       end
 
       it 'creates a new User and returns an access token and other user related details' do
-        expect { post('/api/v1/users', params:) }.to change(User, :count).by(1)
+        expect { post('/api/v1/users', params: signup_params) }.to change(User, :count).by(1)
 
         expect(response).to have_http_status(:ok)
 
@@ -30,7 +30,7 @@ RSpec.describe 'User Registration API specs', type: :request do
     end
 
     context 'when invalid params are passed as part of the request' do
-      context 'when invalid client id passed' do
+      context 'when invalid client id is passed' do
         let(:params) do
           {
             'email': 'user2@example.com',
@@ -39,7 +39,7 @@ RSpec.describe 'User Registration API specs', type: :request do
           }
         end
 
-        it 'fails with an appropriate error response status & error message' do
+        it 'fails with an unauthorized error response status & unkown client error message' do
           post('/api/v1/users', params:)
 
           expect(response).to have_http_status(:unauthorized)
@@ -50,7 +50,7 @@ RSpec.describe 'User Registration API specs', type: :request do
         end
       end
 
-      context 'when user with an invalid email id passed' do
+      context 'when an invalid email is passed' do
         let(:application) { create(:application) }
         let(:params) do
           {
@@ -60,7 +60,7 @@ RSpec.describe 'User Registration API specs', type: :request do
           }
         end
 
-        it 'fails with an appropriate error response status & error message' do
+        it 'fails with a unprocessable_entity error response status & an email is invalid error message' do
           post('/api/v1/users', params:)
 
           expect(response).to have_http_status(:unprocessable_entity)

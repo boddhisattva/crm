@@ -13,6 +13,6 @@ class CreateCustomers < ActiveRecord::Migration[7.1]
       t.timestamps
     end
 
-    add_index :customers, %i[name surname], unique: true
+    add_index :customers, %i[name surname created_by_id], unique: true
   end
 end
