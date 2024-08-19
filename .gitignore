@@ -8,7 +8,7 @@
 /.bundle
 
 # Ignore all environment files (except templates).
-/.env*
+/.env
 !/.env*.erb
 
 # Ignore all logfiles and tempfiles.
@@ -37,3 +37,4 @@
 # Other new files ignored
 .ruby-gemset
 .DS_Store
+

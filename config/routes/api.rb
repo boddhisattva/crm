@@ -7,7 +7,7 @@ namespace :api do
     end
 
     resources :users, module: :users do
-      resources :customers, only: [:index]
+      resources :customers, only: %i[index create]
     end
   end
 end

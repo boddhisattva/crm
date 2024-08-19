@@ -44,7 +44,7 @@ gem 'tzinfo-data', platforms: %i[windows jruby]
 gem 'bootsnap', require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-# gem "image_processing", "~> 1.2"
+gem 'image_processing', '~> 1.2'
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
@@ -61,6 +61,7 @@ group :development, :test do
   gem 'rubocop-rspec_rails', require: false # RSpec Rails-specific analysis for one's projects
   gem 'shoulda-matchers' # Simple One-Liner Tests for Rails
   gem 'strong_migrations' # Catch unsafe migrations in development
+  gem "dotenv-rails", "~> 3.1" # Loads environment variables from '.env'
 end
 
 group :development do
@@ -83,3 +84,6 @@ gem 'devise', '~> 4.9' # Flexible authentication solution for Rails with Warden
 gem 'doorkeeper', '~> 5.7' # OAuth 2 provider for Rails and Grape
 
 gem 'will_paginate', '~> 4.0' # Adds Pagination capabilities
+
+gem 'jsonapi-serializer', '~> 2.2' # An Alternative fast JSONApi serializer
+
