@@ -10,7 +10,7 @@ module API
 
         def index
           customers = Customer.includes(:photo_attachment)
-                              .where(created_by: params[:user_id])
+                              .where(created_by: current_user.id)
                               .page(params[:page]).per_page(CUSTOMERS_PER_PAGE)
 
           return render json: [], status: :ok if customers.blank?
@@ -20,8 +20,8 @@ module API
 
         def create
           customer = Customer.new(customer_params)
-          customer.created_by_id = params[:user_id]
-          customer.last_modified_by_id = params[:user_id]
+          customer.created_by_id = current_user&.id
+          customer.last_modified_by_id = current_user&.id
 
           if customer.save
             render json: CustomerSerializer.new(customer).serializable_hash[:data][:attributes], status: :created
@@ -33,7 +33,7 @@ module API
         private
 
           def customer_params
-            params.permit(:name, :surname, :photo, :identifier)
+            params.require(:customer).permit(:name, :surname, :photo, :identifier)
           end
 
           def require_all_customer_params

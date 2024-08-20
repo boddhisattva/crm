@@ -3,14 +3,110 @@
 require 'rails_helper'
 
 RSpec.describe 'Customers API specs', type: :request do
-  describe 'DELETE /api/v1/customers/:customer_id' do
-    let(:user1) { create(:user) }
-    let(:token) { create :access_token, application: create(:application), resource_owner_id: user1.id }
+  let(:user1) { create(:user) }
+  let(:token) { create :access_token, application: create(:application), resource_owner_id: user1.id }
 
-    before do
-      token
+  before do
+    token
+  end
+
+  describe 'PUT /api/v1/customers/:customer_id' do
+    context 'when customer exists' do
+      let(:customer) { create(:customer, created_by: user1) }
+      let(:photo) { fixture_file_upload('faith_can_move_mountains_rachel_unsplash.jpg') }
+      let(:user2) { create(:user) }
+      let(:token) { create :access_token, application: create(:application), resource_owner_id: user2.id }
+      let(:new_customer_identifier) { SecureRandom.uuid_v7 }
+      let(:update_customer_params) do
+        {
+          'customer': {
+            'surname': 'Rainer',
+            'photo': photo,
+            'identifier': new_customer_identifier
+          }
+        }
+      end
+
+      before { customer }
+
+      it 'updates the customer record & updates the last_modified_by user id f for the same' do
+        expect(customer.last_modified_by_id).to eq(user1.id)
+
+        put "/api/v1/customers/#{customer.id}", params: update_customer_params,
+                                                headers: { 'Authorization': "Bearer #{token.token}" }
+
+        parsed_response_body = JSON.parse(response.body)
+
+        expect(customer.reload.last_modified_by_id).to eq(user2.id)
+        expect(parsed_response_body['surname']).to eq('Rainer')
+        expect(parsed_response_body['photo_url']).to include('faith_can_move_mountains_rachel_unsplash.jpg')
+        expect(parsed_response_body['identifier']).to eq(new_customer_identifier)
+        expect(response).to have_http_status(:ok)
+      end
     end
 
+    context 'when customer does not exist(example: soft deleted customer)' do
+      let(:customer) { create(:customer, created_by: user1) }
+      let(:photo) { fixture_file_upload('faith_can_move_mountains_rachel_unsplash.jpg') }
+      let(:user2) { create(:user) }
+      let(:token) { create :access_token, application: create(:application), resource_owner_id: user2.id }
+      let(:new_customer_identifier) { SecureRandom.uuid_v7 }
+      let(:update_customer_params) do
+        {
+          'customer': {
+            'surname': 'Rainer',
+            'photo': photo,
+            'identifier': new_customer_identifier
+          }
+        }
+      end
+
+      before do
+        customer.destroy # soft delete the customer
+      end
+
+      it 'returns an appropriate customer not found error message & not found status code' do
+        put "/api/v1/customers/#{customer.id}", params: update_customer_params,
+                                                headers: { 'Authorization': "Bearer #{token.token}" }
+
+        parsed_response_body = JSON.parse(response.body)
+
+        expect(parsed_response_body['errors']).to eq('No customer found based with the specified id')
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context 'when we have one or more invalid update customer params - example invalid identifier passed' do
+      let(:customer) { create(:customer, created_by: user1) }
+      let(:photo) { fixture_file_upload('faith_can_move_mountains_rachel_unsplash.jpg') }
+      let(:user2) { create(:user) }
+      let(:token) { create :access_token, application: create(:application), resource_owner_id: user2.id }
+      let(:new_customer_identifier) { 'a random invalid UUID' }
+      let(:update_customer_params) do
+        {
+          'customer': {
+            'surname': 'Rainer',
+            'photo': photo,
+            'identifier': new_customer_identifier
+          }
+        }
+      end
+
+      before { customer }
+
+      it 'returns an appropriate customer not found error message & not found status code' do
+        put "/api/v1/customers/#{customer.id}", params: update_customer_params,
+                                                headers: { 'Authorization': "Bearer #{token.token}" }
+
+        parsed_response_body = JSON.parse(response.body)
+
+        expect(parsed_response_body['errors']).to eq({ 'identifier' => ["can't be blank"] })
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+    end
+  end
+
+  describe 'DELETE /api/v1/customers/:customer_id' do
     context 'when customer exists' do
       let(:customer) { create(:customer, created_by: user1) }
 
@@ -42,7 +138,7 @@ RSpec.describe 'Customers API specs', type: :request do
 
         parsed_response_body = JSON.parse(response.body)
 
-        expect(parsed_response_body['errors']).to eq('No customer found based on the specified id')
+        expect(parsed_response_body['errors']).to eq('No customer found based with the specified id')
         expect(response).to have_http_status(:not_found)
       end
     end

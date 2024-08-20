@@ -46,3 +46,6 @@ RSpec/NestedGroups:
 
 RSpec/MultipleMemoizedHelpers:
   Max: 7
+
+Metrics/AbcSize:
+  Max: 20

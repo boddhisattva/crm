@@ -3,14 +3,14 @@
 require 'rails_helper'
 
 RSpec.describe 'Customers API specs', type: :request do
+  let(:user1) { create(:user) }
+  let(:token) { create :access_token, application: create(:application), resource_owner_id: user1.id }
+
+  before do
+    token
+  end
+
   describe 'GET /api/v1/users/:user_id/customers' do
-    let(:user1) { create(:user) }
-    let(:token) { create :access_token, application: create(:application), resource_owner_id: user1.id }
-
-    before do
-      token
-    end
-
     context 'when one or more customers are present' do
       let(:customer) { create(:customer, created_by: user1) }
       let(:other_customer) { create(:customer, created_by: customer.created_by) }
@@ -43,21 +43,19 @@ RSpec.describe 'Customers API specs', type: :request do
   end
 
   describe 'POST /api/v1/users/:user_id/customers' do
-    let(:user1) { create(:user) }
     let(:photo_name) { 'alfred_schrock_lotus_unsplash.jpg' }
     let(:photo) { fixture_file_upload(photo_name) }
-    let(:token) { create :access_token, application: create(:application), resource_owner_id: user1.id }
+    let(:new_customer_identifier) { SecureRandom.uuid_v7 }
     let(:new_customer_params) do
       {
-        'name': 'Fiona',
-        'surname': 'Rainer',
-        'photo': photo,
-        'identifier': SecureRandom.uuid_v7
+        'customer':
+        {
+          'name': 'Fiona',
+          'surname': 'Rainer',
+          'photo': photo,
+          'identifier': new_customer_identifier
+        }
       }
-    end
-
-    before do
-      token
     end
 
     context 'with valid params' do
@@ -77,6 +75,7 @@ RSpec.describe 'Customers API specs', type: :request do
         expect(parsed_response_body['surname']).to eq('Rainer')
         expect(parsed_response_body['created_by_id']).to eq(user1.id)
         expect(parsed_response_body['last_modified_by_id']).to eq(user1.id)
+        expect(parsed_response_body['identifier']).to eq(new_customer_identifier)
         expect(parsed_response_body['photo_url']).to include(photo_name)
 
         expect(response).to have_http_status(:created)
@@ -86,9 +85,12 @@ RSpec.describe 'Customers API specs', type: :request do
     context 'when required params are not passed' do
       let(:new_customer_params) do
         {
-          'name': 'Fiona',
-          'photo': photo,
-          'identifier': SecureRandom.uuid_v7
+          'customer':
+            {
+              'name': 'Fiona',
+              'photo': photo,
+              'identifier': SecureRandom.uuid_v7
+            }
         }
       end
 
@@ -107,6 +109,7 @@ RSpec.describe 'Customers API specs', type: :request do
 
     context 'with invalid params' do
       context 'when specified user as part of API request does not exist' do
+        let(:token) { create :access_token, application: create(:application), resource_owner_id: invalid_user_id }
         let(:invalid_user_id) { 1234 }
 
         it 'returns appropriate errors related nil user & also returns unprocessable_entity related error' do
@@ -126,10 +129,13 @@ RSpec.describe 'Customers API specs', type: :request do
       context 'when passed customer identifier is an invalid UUID' do
         let(:new_customer_params) do
           {
-            'name': 'Fiona',
-            'surname': 'Rainer',
-            'photo': photo,
-            'identifier': 'random value'
+            'customer':
+              {
+                'name': 'Fiona',
+                'surname': 'Rainer',
+                'photo': photo,
+                'identifier': 'random value'
+              }
           }
         end
 
