@@ -10,7 +10,7 @@ namespace :api do
       resources :customers, only: %i[index create]
     end
 
-    resources :customers, only: %i[destroy]
+    resources :customers, only: %i[destroy update]
   end
 end
 
