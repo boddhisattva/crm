@@ -3,6 +3,8 @@
 class Customer < ApplicationRecord
   has_one_attached :photo
 
+  acts_as_paranoid
+
   # TODO: Add model test
   def photo_url
     Rails.application.routes.url_helpers.url_for(photo) if photo.attached?
@@ -11,7 +13,7 @@ class Customer < ApplicationRecord
   belongs_to :created_by, class_name: 'User'
   belongs_to :last_modified_by, class_name: 'User'
 
-  validates :name, :surname, :created_by, :last_modified_by, presence: true
+  validates :name, :surname, :created_by, :last_modified_by, :identifier, presence: true
 
   validates :name, uniqueness: { scope: %i[surname created_by] }
 end

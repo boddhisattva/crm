@@ -33,11 +33,11 @@ module API
         private
 
           def customer_params
-            params.permit(:name, :surname, :photo)
+            params.permit(:name, :surname, :photo, :identifier)
           end
 
           def require_all_customer_params
-            required_customer_params = %w[name surname photo]
+            required_customer_params = %w[name surname photo identifier]
             customer_params_keys = customer_params.keys
 
             return if required_customer_params.all? { |required_param| customer_params_keys.include?(required_param) }
