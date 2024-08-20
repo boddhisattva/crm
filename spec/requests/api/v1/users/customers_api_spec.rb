@@ -26,9 +26,9 @@ RSpec.describe 'Customers API specs', type: :request do
 
         parsed_response_body = JSON.parse(response.body)
 
-        expect(parsed_response_body['data'][0]['attributes']['name']).to eq('person1')
-        expect(parsed_response_body['data'][1]['attributes']['name']).to eq('person2')
-        expect(parsed_response_body['data'][1]['attributes']['surname']).to eq('person2_surname')
+        expect(parsed_response_body['data'][0]['attributes']['name']).to eq(customer.name)
+        expect(parsed_response_body['data'][1]['attributes']['name']).to eq(other_customer.name)
+        expect(parsed_response_body['data'][1]['attributes']['surname']).to eq(other_customer.surname)
       end
     end
 
@@ -142,7 +142,6 @@ RSpec.describe 'Customers API specs', type: :request do
           parsed_response_body = JSON.parse(response.body)
 
           expect(parsed_response_body['errors']).to eq({ 'identifier' => ["can't be blank"] })
-
           expect(response).to have_http_status(:unprocessable_entity)
         end
       end
