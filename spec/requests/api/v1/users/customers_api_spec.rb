@@ -51,7 +51,8 @@ RSpec.describe 'Customers API specs', type: :request do
       {
         'name': 'Fiona',
         'surname': 'Rainer',
-        'photo': photo
+        'photo': photo,
+        'identifier': SecureRandom.uuid_v7
       }
     end
 
@@ -86,7 +87,8 @@ RSpec.describe 'Customers API specs', type: :request do
       let(:new_customer_params) do
         {
           'name': 'Fiona',
-          'photo': photo
+          'photo': photo,
+          'identifier': SecureRandom.uuid_v7
         }
       end
 
@@ -103,20 +105,46 @@ RSpec.describe 'Customers API specs', type: :request do
       end
     end
 
-    context 'when specified user as part of API request does not exist' do
-      let(:invalid_user_id) { 1234 }
+    context 'with invalid params' do
+      context 'when specified user as part of API request does not exist' do
+        let(:invalid_user_id) { 1234 }
 
-      it 'returns appropriate errors related nil user & also returns unprocessable_entity related error' do
-        expect do
-          post "/api/v1/users/#{invalid_user_id}/customers", params: new_customer_params,
-                                                             headers: { 'Authorization': "Bearer #{token.token}" }
-        end.not_to change(Customer, :count)
+        it 'returns appropriate errors related nil user & also returns unprocessable_entity related error' do
+          expect do
+            post "/api/v1/users/#{invalid_user_id}/customers", params: new_customer_params,
+                                                               headers: { 'Authorization': "Bearer #{token.token}" }
+          end.not_to change(Customer, :count)
 
-        parsed_response_body = JSON.parse(response.body)
+          parsed_response_body = JSON.parse(response.body)
 
-        expect(parsed_response_body['errors']).to eq({ 'created_by' => ['must exist', "can't be blank"],
-                                                       'last_modified_by' => ['must exist', "can't be blank"] })
-        expect(response).to have_http_status(:unprocessable_entity)
+          expect(parsed_response_body['errors']).to eq({ 'created_by' => ['must exist', "can't be blank"],
+                                                         'last_modified_by' => ['must exist', "can't be blank"] })
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
+
+      context 'when passed customer identifier is an invalid UUID' do
+        let(:new_customer_params) do
+          {
+            'name': 'Fiona',
+            'surname': 'Rainer',
+            'photo': photo,
+            'identifier': 'random value'
+          }
+        end
+
+        it 'returns identifier cannot be blank error & also returns unprocessable_entity related error' do
+          expect do
+            post "/api/v1/users/#{user1.id}/customers", params: new_customer_params,
+                                                        headers: { 'Authorization': "Bearer #{token.token}" }
+          end.not_to change(Customer, :count)
+
+          parsed_response_body = JSON.parse(response.body)
+
+          expect(parsed_response_body['errors']).to eq({ 'identifier' => ["can't be blank"] })
+
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
       end
     end
   end

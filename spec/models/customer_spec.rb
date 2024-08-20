@@ -7,6 +7,7 @@ RSpec.describe Customer, type: :model do
   it { is_expected.to validate_presence_of(:surname) }
   it { is_expected.to validate_presence_of(:created_by) }
   it { is_expected.to validate_presence_of(:last_modified_by) }
+  it { is_expected.to validate_presence_of(:identifier) }
 
   context 'when name & surname are same for more than one customers' do
     let(:customer) { create(:customer, name: 'Raj', surname: 'Singh') }

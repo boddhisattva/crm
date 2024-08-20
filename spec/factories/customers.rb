@@ -6,5 +6,6 @@ FactoryBot.define do
     sequence(:surname) { |n| "person#{n}_surname" }
     created_by { create(:user) }
     last_modified_by { created_by }
+    identifier { SecureRandom.uuid_v7 }
   end
 end

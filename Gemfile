@@ -50,6 +50,7 @@ group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem 'bullet', '~> 7.2' # help to kill N+1 queries and unused eager loading.
   gem 'debug', platforms: %i[mri windows]
+  gem 'dotenv-rails', '~> 3.1' # Loads environment variables from '.env'
   gem 'factory_bot_rails' # DSL for defining and using factories
   gem 'pry-byebug', '~> 3.10', '>= 3.10.1' # Useful for debugging purposes
   gem 'rspec-rails' # For Automated tests
@@ -61,7 +62,6 @@ group :development, :test do
   gem 'rubocop-rspec_rails', require: false # RSpec Rails-specific analysis for one's projects
   gem 'shoulda-matchers' # Simple One-Liner Tests for Rails
   gem 'strong_migrations' # Catch unsafe migrations in development
-  gem "dotenv-rails", "~> 3.1" # Loads environment variables from '.env'
 end
 
 group :development do
@@ -87,3 +87,4 @@ gem 'will_paginate', '~> 4.0' # Adds Pagination capabilities
 
 gem 'jsonapi-serializer', '~> 2.2' # An Alternative fast JSONApi serializer
 
+gem 'paranoia', '~> 3.0' # Allows soft deletion capabilities
