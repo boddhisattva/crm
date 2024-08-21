@@ -89,4 +89,6 @@ gem 'jsonapi-serializer', '~> 2.2' # An Alternative fast JSON API serializer
 
 gem 'paranoia', '~> 3.0' # Allows soft deletion capabilities
 
+gem 'active_storage_validations', '~> 1.1', '>= 1.1.4' # Validations for active storage
+
 gem 'oj', '~> 3.16', '>= 3.16.5' # A fast JSON parse and serializer

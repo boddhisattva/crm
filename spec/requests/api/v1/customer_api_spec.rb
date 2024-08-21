@@ -20,7 +20,7 @@ RSpec.describe 'Customer API specs', type: :request do
       end
 
       it 'gets all the customers' do
-        get "/api/v1/customers", params: {}, headers: { 'Authorization': "Bearer #{token.token}" }
+        get '/api/v1/customers', params: {}, headers: { 'Authorization': "Bearer #{token.token}" }
 
         parsed_response_body = JSON.parse(response.body)
 
@@ -33,7 +33,7 @@ RSpec.describe 'Customer API specs', type: :request do
 
     context 'when no customers are present' do
       it 'returns an empty array' do
-        get "/api/v1/customers", params: {}, headers: { 'Authorization': "Bearer #{token.token}" }
+        get '/api/v1/customers', params: {}, headers: { 'Authorization': "Bearer #{token.token}" }
 
         expect(JSON.parse(response.body)).to eq([])
         expect(response).to have_http_status(:ok)
@@ -60,8 +60,8 @@ RSpec.describe 'Customer API specs', type: :request do
     context 'with valid params' do
       it 'creates a new customer' do
         expect do
-          post "/api/v1/customers", params: new_customer_params,
-                                                      headers: { 'Authorization': "Bearer #{token.token}" }
+          post '/api/v1/customers', params: new_customer_params,
+                                    headers: { 'Authorization': "Bearer #{token.token}" }
         end.to change(Customer, :count).from(0).to(1)
            .and change(ActiveStorage::Blob, :count).from(0).to(1)
 
@@ -95,8 +95,8 @@ RSpec.describe 'Customer API specs', type: :request do
 
       it 'fails with a HTTP Bad request error' do
         expect do
-          post "/api/v1/customers", params: new_customer_params,
-                                                      headers: { 'Authorization': "Bearer #{token.token}" }
+          post '/api/v1/customers', params: new_customer_params,
+                                    headers: { 'Authorization': "Bearer #{token.token}" }
         end.not_to change(Customer, :count)
 
         parsed_response_body = JSON.parse(response.body)
@@ -113,8 +113,8 @@ RSpec.describe 'Customer API specs', type: :request do
 
         it 'returns appropriate errors related nil user & also returns unprocessable_entity related error' do
           expect do
-            post "/api/v1/customers", params: new_customer_params,
-                                                               headers: { 'Authorization': "Bearer #{token.token}" }
+            post '/api/v1/customers', params: new_customer_params,
+                                      headers: { 'Authorization': "Bearer #{token.token}" }
           end.not_to change(Customer, :count)
 
           parsed_response_body = JSON.parse(response.body)
@@ -140,8 +140,8 @@ RSpec.describe 'Customer API specs', type: :request do
 
         it 'returns identifier cannot be blank error & also returns unprocessable_entity related error' do
           expect do
-            post "/api/v1/customers", params: new_customer_params,
-                                                        headers: { 'Authorization': "Bearer #{token.token}" }
+            post '/api/v1/customers', params: new_customer_params,
+                                      headers: { 'Authorization': "Bearer #{token.token}" }
           end.not_to change(Customer, :count)
 
           parsed_response_body = JSON.parse(response.body)
