@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Customers API specs', type: :request do
+RSpec.describe 'User API specs', type: :request do
   let(:user1) { create(:user, role: User.roles[:admin]) }
   let(:token) { create :access_token, application: create(:application), resource_owner_id: user1.id }
 
@@ -23,7 +23,7 @@ RSpec.describe 'Customers API specs', type: :request do
     end
 
     context 'with valid params' do
-      it 'creates a new customer' do
+      it 'creates a new user' do
         expect do
           post '/api/v1/admin/users', params: new_user_params,
                                       headers: { 'Authorization': "Bearer #{token.token}" }
@@ -101,6 +101,81 @@ RSpec.describe 'Customers API specs', type: :request do
 
         expect(parsed_response_body['errors']).to eq('You need to be an admin in order to access this API')
         expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
+
+  describe 'DELETE /api/v1/admin/users/:user_id' do
+    context 'when user exists' do
+      let(:user) { create(:user) }
+
+      before { user }
+
+      it 'soft deletes the user record & updates the deleted_at timestamp for the same' do
+        expect(user.deleted_at).to be_nil
+
+        expect do
+          delete "/api/v1/admin/users/#{user.id}", params: {},
+                                                   headers: { 'Authorization': "Bearer #{token.token}" }
+        end.to change(User, :count).by(-1)
+
+        soft_deleted_user = User.with_deleted.find_by(id: user.id)
+
+        expect(soft_deleted_user.deleted_at).not_to be_nil
+        expect(response).to have_http_status(:no_content)
+      end
+    end
+
+    context 'when user does not exist' do
+      let(:invalid_user_id) { '0134278965' }
+
+      it 'returns an appropriate user not found error message & not found status code' do
+        expect do
+          delete "/api/v1/admin/users/#{invalid_user_id}", params: {},
+                                                           headers: { 'Authorization': "Bearer #{token.token}" }
+        end.not_to change(User, :count)
+
+        parsed_response_body = JSON.parse(response.body)
+
+        expect(parsed_response_body['errors']).to eq('No user found with the specified id')
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context 'when logged in user attempting to access the API admin route does not have an admin role' do
+      let(:user1) { create(:user, role: User.roles[:user]) }
+      let(:user) { create(:user) }
+
+      before do
+        user
+      end
+
+      it 'returns with you need to be an admin to acess this API error and returns an HTTP unuathorized status code' do
+        expect do
+          delete "/api/v1/admin/users/#{user.id}", params: {},
+                                                   headers: { 'Authorization': "Bearer #{token.token}" }
+        end.not_to change(User, :count)
+
+        parsed_response_body = JSON.parse(response.body)
+
+        expect(parsed_response_body['errors']).to eq('You need to be an admin in order to access this API')
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    context 'when logged in admin user tries to soft delete their own account' do
+      it 'soft deletes the user record & updates the deleted_at timestamp for the same' do
+        expect(user1.deleted_at).to be_nil
+
+        expect do
+          delete "/api/v1/admin/users/#{user1.id}", params: {},
+                                                    headers: { 'Authorization': "Bearer #{token.token}" }
+        end.to change(User, :count).by(-1)
+
+        soft_deleted_user = User.with_deleted.find_by(id: user1.id)
+
+        expect(soft_deleted_user.deleted_at).not_to be_nil
+        expect(response).to have_http_status(:no_content)
       end
     end
   end

@@ -11,7 +11,7 @@ namespace :api do
     end
 
     namespace :admin, module: :admin do
-      resources :users, only: %i[create]
+      resources :users, only: %i[create destroy]
     end
 
     resources :customers, only: %i[destroy update show]

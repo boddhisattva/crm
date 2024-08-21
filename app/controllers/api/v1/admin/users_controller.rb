@@ -16,6 +16,16 @@ module API
           end
         end
 
+        def destroy
+          user = User.find_by(id: params[:id])
+
+          if user.present?
+            head :no_content if user.destroy
+          else
+            render json: { errors: 'No user found with the specified id' }, status: :not_found
+          end
+        end
+
         private
 
           def user_params
