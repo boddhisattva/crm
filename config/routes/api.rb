@@ -10,6 +10,10 @@ namespace :api do
       resources :customers, only: %i[index create]
     end
 
+    namespace :admin, module: :admin do
+      resources :users, only: %i[create]
+    end
+
     resources :customers, only: %i[destroy update show]
   end
 end

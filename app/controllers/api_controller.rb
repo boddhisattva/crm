@@ -15,4 +15,11 @@ class APIController < ApplicationController
 
     @current_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
   end
+
+  def admin?
+    return if current_user&.admin?
+
+    render json: { errors: 'You need to be an admin in order to proceed further' },
+           status: :not_found
+  end
 end
