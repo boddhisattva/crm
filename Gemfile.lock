@@ -155,8 +155,6 @@ GEM
     loofah (2.22.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
-    macaddr (1.7.2)
-      systemu (~> 2.6.5)
     mail (2.8.1)
       mini_mime (>= 0.1.1)
       net-imap
@@ -191,7 +189,11 @@ GEM
       racc (~> 1.4)
     nokogiri (1.16.7-x86_64-linux)
       racc (~> 1.4)
+    oj (3.16.5)
+      bigdecimal (>= 3.0)
+      ostruct (>= 0.2)
     orm_adapter (0.5.0)
+    ostruct (0.6.0)
     parallel (1.26.2)
     paranoia (3.0.0)
       activerecord (>= 6, < 8.1)
@@ -332,7 +334,6 @@ GEM
     strong_migrations (2.0.0)
       activerecord (>= 6.1)
     strscan (3.1.0)
-    systemu (2.6.5)
     thor (1.3.1)
     timeout (0.4.1)
     turbo-rails (2.0.6)
@@ -343,10 +344,6 @@ GEM
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.5.0)
     uniform_notifier (1.16.0)
-    uuid (2.3.9)
-      macaddr (~> 1.0)
-    uuid_v6 (0.1.1)
-      uuid
     warden (1.2.9)
       rack (>= 2.0.9)
     web-console (4.2.1)
@@ -384,6 +381,7 @@ DEPENDENCIES
   importmap-rails
   jbuilder
   jsonapi-serializer (~> 2.2)
+  oj (~> 3.16, >= 3.16.5)
   paranoia (~> 3.0)
   pg (~> 1.1)
   pry-byebug (~> 3.10, >= 3.10.1)
@@ -403,7 +401,6 @@ DEPENDENCIES
   strong_migrations
   turbo-rails
   tzinfo-data
-  uuid_v6 (~> 0.1.1)
   web-console
   will_paginate (~> 4.0)
 
