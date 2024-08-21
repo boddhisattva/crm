@@ -6,10 +6,6 @@ namespace :api do
       post '/', to: 'registrations#create', as: :user_registration
     end
 
-    resources :users, module: :users do
-      resources :customers, only: %i[index create]
-    end
-
     namespace :admin, module: :admin do
       resources :users, only: %i[create destroy update index]
     end
