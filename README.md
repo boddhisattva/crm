@@ -6,7 +6,7 @@ API Backend for the CRM Service
 
 ## Areas of Improvement
 - One can add Rate limiting capabilities
-- One can add Master and Replica setup and access relevan
+- One can add Master and Replica setup and access relevant API's where appropriate for better performance
 
 ## Usage
 
