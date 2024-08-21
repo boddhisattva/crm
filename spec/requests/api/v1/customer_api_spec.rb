@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Customers API specs', type: :request do
+RSpec.describe 'Customer API specs', type: :request do
   let(:user1) { create(:user) }
   let(:token) { create :access_token, application: create(:application), resource_owner_id: user1.id }
 
