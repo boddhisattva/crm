@@ -179,4 +179,129 @@ RSpec.describe 'User API specs', type: :request do
       end
     end
   end
+
+  describe 'PUT /api/v1/admin/users/:user_id' do
+    context 'when user exists' do
+      let(:user) { create(:user, role: 'user') }
+      let(:new_email) { 'user1@example.com' }
+      let(:update_user_params) do
+        {
+          'user': {
+            'email': new_email,
+            'role': 'admin'
+          }
+        }
+      end
+
+      before { user }
+
+      it 'updates the user record & updates the last_modified_by user id f for the same' do
+        put "/api/v1/admin/users/#{user.id}", params: update_user_params,
+                                              headers: { 'Authorization': "Bearer #{token.token}" }
+
+        parsed_response_body = JSON.parse(response.body)
+
+        expect(parsed_response_body['email']).to eq(new_email)
+        expect(parsed_response_body['role']).to eq('admin')
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context 'when user does not exist(example: soft deleted user)' do
+      let(:user) { create(:user, role: 'user') }
+      let(:new_email) { 'user1@example.com' }
+      let(:update_user_params) do
+        {
+          'user': {
+            'email': new_email,
+            'role': 'admin'
+          }
+        }
+      end
+
+      before do
+        user.destroy # soft delete the user
+      end
+
+      it 'returns an appropriate user not found error message & not found status code' do
+        put "/api/v1/admin/users/#{user.id}", params: update_user_params,
+                                              headers: { 'Authorization': "Bearer #{token.token}" }
+
+        parsed_response_body = JSON.parse(response.body)
+
+        expect(parsed_response_body['errors']).to eq('No user found with the specified id')
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context 'with invalid params' do
+      context 'when email specifed is invalid' do
+        let(:user) { create(:user, role: 'user') }
+        let(:invalid_email) { 'a random email id' }
+        let(:update_user_params) do
+          {
+            'user':
+            {
+              'email': invalid_email
+            }
+          }
+        end
+
+        it 'returns a email is invalid error and returns a HTTP unprocessable_entity status code' do
+          put "/api/v1/admin/users/#{user.id}", params: update_user_params,
+                                                headers: { 'Authorization': "Bearer #{token.token}" }
+
+          parsed_response_body = JSON.parse(response.body)
+
+          expect(parsed_response_body['errors']).to eq({ 'email' => ['is invalid'] })
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
+    end
+
+    context 'when logged in user attempting to access the API admin route does not have an admin role' do
+      let(:user1) { create(:user, role: User.roles[:user]) }
+      let(:user) { create(:user, role: 'user') }
+      let(:new_email) { 'user1@example.com' }
+      let(:update_user_params) do
+        {
+          'user': {
+            'email': new_email,
+            'role': 'admin'
+          }
+        }
+      end
+
+      it 'returns with you need to be an admin to acess this API error and returns an HTTP unuathorized status code' do
+        put "/api/v1/admin/users/#{user.id}", params: update_user_params,
+                                              headers: { 'Authorization': "Bearer #{token.token}" }
+
+        parsed_response_body = JSON.parse(response.body)
+
+        expect(parsed_response_body['errors']).to eq('You need to be an admin in order to access this API')
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    context 'when user tries to update their own details' do
+      let(:new_email) { 'user12@example.com' }
+      let(:update_user_params) do
+        {
+          'user': {
+            'email': new_email
+          }
+        }
+      end
+
+      it 'updates the user details successfully' do
+        put "/api/v1/admin/users/#{user1.id}", params: update_user_params,
+                                               headers: { 'Authorization': "Bearer #{token.token}" }
+
+        parsed_response_body = JSON.parse(response.body)
+
+        expect(parsed_response_body['email']).to eq(new_email)
+        expect(response).to have_http_status(:ok)
+      end
+    end
+  end
 end

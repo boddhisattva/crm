@@ -170,7 +170,7 @@ RSpec.describe 'Customer API specs', type: :request do
     end
 
     context 'when customer does not exist' do
-      let(:invalid_customer_id) { '1342' }
+      let(:invalid_customer_id) { '0134278965' }
 
       it 'returns an appropriate customer not found error message & not found status code' do
         expect do
