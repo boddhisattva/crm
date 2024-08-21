@@ -10,6 +10,37 @@ RSpec.describe 'Customer API specs', type: :request do
     token
   end
 
+  describe 'GET /api/v1/customers' do
+    context 'when one or more customers are present' do
+      let(:customer) { create(:customer, created_by: user1) }
+      let(:other_customer) { create(:customer, created_by: customer.created_by) }
+
+      before do
+        other_customer
+      end
+
+      it 'gets all the customers' do
+        get "/api/v1/customers", params: {}, headers: { 'Authorization': "Bearer #{token.token}" }
+
+        parsed_response_body = JSON.parse(response.body)
+
+        expect(parsed_response_body['data'][0]['attributes']['name']).to eq(customer.name)
+        expect(parsed_response_body['data'][1]['attributes']['name']).to eq(other_customer.name)
+        expect(parsed_response_body['data'][1]['attributes']['surname']).to eq(other_customer.surname)
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context 'when no customers are present' do
+      it 'returns an empty array' do
+        get "/api/v1/customers", params: {}, headers: { 'Authorization': "Bearer #{token.token}" }
+
+        expect(JSON.parse(response.body)).to eq([])
+        expect(response).to have_http_status(:ok)
+      end
+    end
+  end
+
   describe 'POST /api/v1/customers' do
     let(:photo_name) { 'alfred_schrock_lotus_unsplash.jpg' }
     let(:photo) { fixture_file_upload(photo_name) }
