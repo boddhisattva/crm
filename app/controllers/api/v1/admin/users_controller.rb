@@ -4,7 +4,17 @@ module API
   module V1
     module Admin
       class UsersController < APIController
+        USERS_PER_PAGE = 10
+
         before_action :admin?
+
+        def index
+          users = User.page(params[:page]).per_page(USERS_PER_PAGE)
+
+          return render json: [], status: :ok if users.blank?
+
+          render json: ::Admin::UserSerializer.new(users).serializable_hash, status: :ok
+        end
 
         def create
           user = User.new(user_params)
