@@ -10,7 +10,7 @@ module API
 
         def index
           customers = Customer.includes(photo_attachment: :blob)
-                              .where(created_by: current_user.id)
+                              .where(created_by: current_user.id) # TODO: remove this line as we want all customers & not only those created by a specific User
                               .page(params[:page]).per_page(CUSTOMERS_PER_PAGE)
 
           return render json: [], status: :ok if customers.blank?

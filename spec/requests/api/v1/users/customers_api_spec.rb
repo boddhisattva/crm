@@ -22,13 +22,12 @@ RSpec.describe 'Customers API specs', type: :request do
       it 'gets all the customers' do
         get "/api/v1/users/#{user1.id}/customers", params: {}, headers: { 'Authorization': "Bearer #{token.token}" }
 
-        expect(response).to have_http_status(:ok)
-
         parsed_response_body = JSON.parse(response.body)
 
         expect(parsed_response_body['data'][0]['attributes']['name']).to eq(customer.name)
         expect(parsed_response_body['data'][1]['attributes']['name']).to eq(other_customer.name)
         expect(parsed_response_body['data'][1]['attributes']['surname']).to eq(other_customer.surname)
+        expect(response).to have_http_status(:ok)
       end
     end
 

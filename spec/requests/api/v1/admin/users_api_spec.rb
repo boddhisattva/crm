@@ -91,7 +91,7 @@ RSpec.describe 'User API specs', type: :request do
     context 'when logged in user attempting to access the API admin route does not have an admin role' do
       let(:user1) { create(:user, role: User.roles[:user]) }
 
-      it 'returns with you need to be an admin to acess this API error and returns an HTTP unuathorized status code' do
+      it 'returns with you need to be an admin to access this API error and returns an HTTP unuathorized status code' do
         expect do
           post '/api/v1/admin/users', params: new_user_params,
                                       headers: { 'Authorization': "Bearer #{token.token}" }
@@ -150,7 +150,7 @@ RSpec.describe 'User API specs', type: :request do
         user
       end
 
-      it 'returns with you need to be an admin to acess this API error and returns an HTTP unuathorized status code' do
+      it 'returns with you need to be an admin to access this API error and returns an HTTP unuathorized status code' do
         expect do
           delete "/api/v1/admin/users/#{user.id}", params: {},
                                                    headers: { 'Authorization': "Bearer #{token.token}" }
@@ -272,7 +272,7 @@ RSpec.describe 'User API specs', type: :request do
         }
       end
 
-      it 'returns with you need to be an admin to acess this API error and returns an HTTP unuathorized status code' do
+      it 'returns with you need to be an admin to access this API error and returns an HTTP unuathorized status code' do
         put "/api/v1/admin/users/#{user.id}", params: update_user_params,
                                               headers: { 'Authorization': "Bearer #{token.token}" }
 
@@ -301,6 +301,46 @@ RSpec.describe 'User API specs', type: :request do
 
         expect(parsed_response_body['email']).to eq(new_email)
         expect(response).to have_http_status(:ok)
+      end
+    end
+  end
+
+  describe 'GET /api/v1/users/:user_id/customers' do
+    context 'when one or more customers are present' do
+      let(:user) { create(:user) }
+      let(:other_user) { create(:user) }
+
+      before do
+        user
+        other_user
+      end
+
+      it 'gets all the customers' do
+        get '/api/v1/admin/users', params: {}, headers: { 'Authorization': "Bearer #{token.token}" }
+
+        parsed_response_body = JSON.parse(response.body)
+
+        expect(parsed_response_body['data'][0]['attributes']['email']).to eq(user1.email)
+        expect(parsed_response_body['data'][0]['attributes']['role']).to eq(user1.role)
+        expect(parsed_response_body['data'][1]['attributes']['email']).to eq(user.email)
+        expect(parsed_response_body['data'][1]['attributes']['role']).to eq(user.role)
+        expect(parsed_response_body['data'][2]['attributes']['email']).to eq(other_user.email)
+        expect(parsed_response_body['data'][2]['attributes']['role']).to eq(other_user.role)
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context 'when logged in user attempting to access the API admin route does not have an admin role' do
+      let(:user1) { create(:user, role: User.roles[:user]) }
+
+      it 'returns with you need to be an admin to access this API error and returns an HTTP unuathorized status code' do
+        get '/api/v1/admin/users', params: {},
+                                   headers: { 'Authorization': "Bearer #{token.token}" }
+
+        parsed_response_body = JSON.parse(response.body)
+
+        expect(parsed_response_body['errors']).to eq('You need to be an admin in order to access this API')
+        expect(response).to have_http_status(:unauthorized)
       end
     end
   end
