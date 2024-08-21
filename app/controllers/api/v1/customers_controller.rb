@@ -3,6 +3,22 @@
 module API
   module V1
     class CustomersController < APIController
+      CUSTOMERS_PER_PAGE = 10
+
+      before_action :require_all_customer_params, only: %i[create]
+
+      def create
+        customer = Customer.new(customer_params)
+        customer.created_by_id = current_user&.id
+        customer.last_modified_by_id = current_user&.id
+
+        if customer.save
+          render json: CustomerSerializer.new(customer).serializable_hash[:data][:attributes], status: :created
+        else
+          render json: { errors: customer.errors }, status: :unprocessable_entity
+        end
+      end
+
       def show
         customer = Customer.find_by(id: params[:id])
 
@@ -45,6 +61,16 @@ module API
 
         def customer_params
           params.require(:customer).permit(:name, :surname, :photo, :identifier)
+        end
+
+        def require_all_customer_params
+          required_customer_params = %w[name surname photo identifier]
+          customer_params_keys = customer_params.keys
+
+          return if required_customer_params.all? { |required_param| customer_params_keys.include?(required_param) }
+
+          render json: { errors: "#{required_customer_params - customer_params.keys} param(s) is/are not present" },
+                 status: :bad_request
         end
     end
   end

@@ -14,7 +14,7 @@ namespace :api do
       resources :users, only: %i[create destroy update index]
     end
 
-    resources :customers, only: %i[destroy update show]
+    resources :customers, only: %i[destroy update show create]
   end
 end
 

@@ -10,6 +10,118 @@ RSpec.describe 'Customer API specs', type: :request do
     token
   end
 
+  describe 'POST /api/v1/customers' do
+    let(:photo_name) { 'alfred_schrock_lotus_unsplash.jpg' }
+    let(:photo) { fixture_file_upload(photo_name) }
+    let(:new_customer_identifier) { SecureRandom.uuid_v7 }
+    let(:new_customer_params) do
+      {
+        'customer':
+        {
+          'name': 'Fiona',
+          'surname': 'Rainer',
+          'photo': photo,
+          'identifier': new_customer_identifier
+        }
+      }
+    end
+
+    context 'with valid params' do
+      it 'creates a new customer' do
+        expect do
+          post "/api/v1/customers", params: new_customer_params,
+                                                      headers: { 'Authorization': "Bearer #{token.token}" }
+        end.to change(Customer, :count).from(0).to(1)
+           .and change(ActiveStorage::Blob, :count).from(0).to(1)
+
+        latest_uploaded_image = ActiveStorage::Blob.last
+
+        expect(latest_uploaded_image.filename).to eq(photo_name)
+
+        parsed_response_body = JSON.parse(response.body)
+        expect(parsed_response_body['name']).to eq('Fiona')
+        expect(parsed_response_body['surname']).to eq('Rainer')
+        expect(parsed_response_body['created_by_id']).to eq(user1.id)
+        expect(parsed_response_body['last_modified_by_id']).to eq(user1.id)
+        expect(parsed_response_body['identifier']).to eq(new_customer_identifier)
+        expect(parsed_response_body['photo_url']).to include(photo_name)
+
+        expect(response).to have_http_status(:created)
+      end
+    end
+
+    context 'when required params(example: surname not passed in API request) are not passed' do
+      let(:new_customer_params) do
+        {
+          'customer':
+            {
+              'name': 'Fiona',
+              'photo': photo,
+              'identifier': SecureRandom.uuid_v7
+            }
+        }
+      end
+
+      it 'fails with a HTTP Bad request error' do
+        expect do
+          post "/api/v1/customers", params: new_customer_params,
+                                                      headers: { 'Authorization': "Bearer #{token.token}" }
+        end.not_to change(Customer, :count)
+
+        parsed_response_body = JSON.parse(response.body)
+
+        expect(parsed_response_body['errors']).to eq('["surname"] param(s) is/are not present')
+        expect(response).to have_http_status(:bad_request)
+      end
+    end
+
+    context 'with invalid params' do
+      context 'when specified user as part of API request does not exist' do
+        let(:token) { create :access_token, application: create(:application), resource_owner_id: invalid_user_id }
+        let(:invalid_user_id) { 1234 }
+
+        it 'returns appropriate errors related nil user & also returns unprocessable_entity related error' do
+          expect do
+            post "/api/v1/customers", params: new_customer_params,
+                                                               headers: { 'Authorization': "Bearer #{token.token}" }
+          end.not_to change(Customer, :count)
+
+          parsed_response_body = JSON.parse(response.body)
+
+          expect(parsed_response_body['errors']).to eq({ 'created_by' => ['must exist', "can't be blank"],
+                                                         'last_modified_by' => ['must exist', "can't be blank"] })
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
+
+      context 'when passed customer identifier is an invalid UUID' do
+        let(:new_customer_params) do
+          {
+            'customer':
+              {
+                'name': 'Fiona',
+                'surname': 'Rainer',
+                'photo': photo,
+                'identifier': 'random value'
+              }
+          }
+        end
+
+        it 'returns identifier cannot be blank error & also returns unprocessable_entity related error' do
+          expect do
+            post "/api/v1/customers", params: new_customer_params,
+                                                        headers: { 'Authorization': "Bearer #{token.token}" }
+          end.not_to change(Customer, :count)
+
+          parsed_response_body = JSON.parse(response.body)
+
+          expect(parsed_response_body['errors']).to eq({ 'identifier' => ["can't be blank"] })
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
+    end
+  end
+
   describe 'GET /api/v1/customers/:customer_id' do
     context 'when customer exists' do
       let(:customer) { create(:customer, created_by: user1, identifier: new_customer_identifier) }
