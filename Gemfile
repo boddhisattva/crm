@@ -85,6 +85,6 @@ gem 'doorkeeper', '~> 5.7' # OAuth 2 provider for Rails and Grape
 
 gem 'will_paginate', '~> 4.0' # Adds Pagination capabilities
 
-gem 'jsonapi-serializer', '~> 2.2' # An Alternative fast JSONApi serializer
+gem 'jsonapi-serializer', '~> 2.2' # An Alternative fast JSON API serializer
 
 gem 'paranoia', '~> 3.0' # Allows soft deletion capabilities
