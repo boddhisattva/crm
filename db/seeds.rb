@@ -14,5 +14,4 @@ Doorkeeper::Application.create!(name: 'CRM App', redirect_uri: '', scopes: '') i
 
 User.first_or_create(email: 'user1@example.com',
                      password: 'passwd',
-                     password_confirmation: 'passwd',
                      role: User.roles[:admin])

@@ -82,7 +82,7 @@ RSpec.describe 'Customers API specs', type: :request do
       end
     end
 
-    context 'when required params are not passed' do
+    context 'when required params(example: surname not passed in API request) are not passed' do
       let(:new_customer_params) do
         {
           'customer':

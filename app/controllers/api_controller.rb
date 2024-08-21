@@ -19,7 +19,7 @@ class APIController < ApplicationController
   def admin?
     return if current_user&.admin?
 
-    render json: { errors: 'You need to be an admin in order to proceed further' },
-           status: :not_found
+    render json: { errors: 'You need to be an admin in order to access this API' },
+           status: :unauthorized
   end
 end
