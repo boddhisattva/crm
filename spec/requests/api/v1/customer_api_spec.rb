@@ -10,6 +10,48 @@ RSpec.describe 'Customers API specs', type: :request do
     token
   end
 
+  describe 'GET /api/v1/customers/:customer_id' do
+    context 'when customer exists' do
+      let(:customer) { create(:customer, created_by: user1, identifier: new_customer_identifier) }
+      let(:new_customer_identifier) { SecureRandom.uuid_v7 }
+
+      before do
+        customer
+      end
+
+      it 'returns customer details' do
+        get "/api/v1/customers/#{customer.id}", params: {},
+                                                headers: { 'Authorization': "Bearer #{token.token}" }
+
+        parsed_response_body = JSON.parse(response.body)
+
+        expect(parsed_response_body['name']).to eq(customer.name)
+        expect(parsed_response_body['surname']).to eq(customer.surname)
+        expect(parsed_response_body['photo_url']).to include('faith_can_move_mountains_rachel_unsplash.jpg')
+        expect(parsed_response_body['identifier']).to eq(new_customer_identifier)
+        expect(parsed_response_body['created_by_id']).to eq(user1.id)
+        expect(parsed_response_body['last_modified_by_id']).to eq(user1.id)
+        expect(parsed_response_body['created_at']).not_to be_nil
+        expect(parsed_response_body['updated_at']).not_to be_nil
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context 'when customer does not exist' do
+      let(:invalid_customer_id) { '1342' }
+
+      it 'returns an appropriate customer not found error message & not found status code' do
+        get "/api/v1/customers/#{invalid_customer_id}", params: {},
+                                                        headers: { 'Authorization': "Bearer #{token.token}" }
+
+        parsed_response_body = JSON.parse(response.body)
+
+        expect(parsed_response_body['errors']).to eq('No customer found with the specified id')
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
+
   describe 'PUT /api/v1/customers/:customer_id' do
     context 'when customer exists' do
       let(:customer) { create(:customer, created_by: user1) }
@@ -71,7 +113,7 @@ RSpec.describe 'Customers API specs', type: :request do
 
         parsed_response_body = JSON.parse(response.body)
 
-        expect(parsed_response_body['errors']).to eq('No customer found based with the specified id')
+        expect(parsed_response_body['errors']).to eq('No customer found with the specified id')
         expect(response).to have_http_status(:not_found)
       end
     end
@@ -138,7 +180,7 @@ RSpec.describe 'Customers API specs', type: :request do
 
         parsed_response_body = JSON.parse(response.body)
 
-        expect(parsed_response_body['errors']).to eq('No customer found based with the specified id')
+        expect(parsed_response_body['errors']).to eq('No customer found with the specified id')
         expect(response).to have_http_status(:not_found)
       end
     end

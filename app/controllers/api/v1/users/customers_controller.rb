@@ -9,7 +9,7 @@ module API
         before_action :require_all_customer_params, only: %i[create]
 
         def index
-          customers = Customer.includes(:photo_attachment)
+          customers = Customer.includes(photo_attachment: :blob)
                               .where(created_by: current_user.id)
                               .page(params[:page]).per_page(CUSTOMERS_PER_PAGE)
 

@@ -3,10 +3,21 @@
 module API
   module V1
     class CustomersController < APIController
+      def show
+        customer = Customer.find_by(id: params[:id])
+
+        if customer.blank?
+          render json: { errors: 'No customer found with the specified id' },
+                 status: :not_found
+        else
+          render json: CustomerSerializer.new(customer).serializable_hash[:data][:attributes], status: :ok
+        end
+      end
+
       def update
         customer = Customer.find_by(id: params[:id])
         if customer.blank?
-          return render json: { errors: 'No customer found based with the specified id' },
+          return render json: { errors: 'No customer found with the specified id' },
                         status: :not_found
         end
 
@@ -26,7 +37,7 @@ module API
         if customer.present?
           head :no_content if customer.destroy
         else
-          render json: { errors: 'No customer found based with the specified id' }, status: :not_found
+          render json: { errors: 'No customer found with the specified id' }, status: :not_found
         end
       end
 
