@@ -115,7 +115,7 @@ From the project root directory:
 
 - **About**: This generates an access token that can be used to access different protected API's. This functionality is provided out of the box by the doorkeeper gem.
 
-- **Signin URL**: `http://localhost:3000/oauth/token`
+- **Login API URL**: `http://localhost:3000/oauth/token`
 
 - **HTTP Method**: POST
 
@@ -148,11 +148,94 @@ From the project root directory:
     }
     ```
 
-- 3. **Accessing Protected app API's**:
+- **Accessing Protected app API's**:
   *  Upon successfully running the above API
       * The resulting `access_token` that is generated from the API call(as shown in the sample response above) can be used to call the apps protected API's
 
-#### 3. Example of accessing a Protected API using the access token generated from 1. or 2. above
+#### 3. Refresh Token API
+
+- **About**: This functionality normally comes in handy when one's current access token is almost expired. This generates a new access token & a new refresh token that can be used to have continued access to different protected API's. This functionality is provided out of the box by the doorkeeper gem.
+
+- **Refresh Token API URL**: `http://localhost:3000/oauth/token`
+
+- **HTTP Method**: POST
+
+- **Sample POST Request Body and Sample API response**:
+
+  -  **Prequisities**:
+    1. Client_id: This corresponds to the id generated when we first created a new Doorkeeper application with the `rake db:seed` command.
+    It's value can be obtained with the command `Doorkeeper::Application.first.uid` specified in Rails console
+
+    2. Client_secret: This corresponds to the secret generated when we first created a new Doorkeeper application with the `rake db:seed` command.
+    It's value can be obtained with the command `Doorkeeper::Application.first.secret` specified in Rails console
+
+    3. Refresh token: This corresponds to the value of the refresh token obtained from the Sign up API or Login API specified above.
+
+    4. Grant type: The grant_type value should be `refresh_token` as we are using the referesh token inorder to authenticate a user.
+
+  - **Sample API POST Request body for Refresh Token API**:
+
+    One can see how to specify the POST request params via using `form-data` option in an API client like `Postman` [here](./spec/fixtures/files/refresh_token_sample_api_request.png)
+
+  - **Sample API response for Refresh Token API**:
+
+    ```
+    {
+        "access_token": "1mfjNrMo_Lzw-XCrksjNUiNRAAx6ht4y6zMBwFOwmo8",
+        "token_type": "Bearer",
+        "expires_in": 7200,
+        "refresh_token": "OBPn0QTWpvKXY0bXNA0ub9RiDGj05qn4vEAlTLWmOPY",
+        "created_at": 1724350796
+    }
+    ```
+
+- **Accessing Protected app API's**:
+  *  Upon successfully running the above API
+      * The resulting `access_token` that is generated from the API call(as shown in the sample response above) can be used to call the apps protected API's
+
+#### 4. User Logout API
+
+- **About**: Logging out a user involves revoking an access token so that the same access token cannot be used anymore. This functionality is provided out of the box by the doorkeeper gem.
+
+- **Logout API URL**: `http://localhost:3000/oauth/token`
+
+- **HTTP Method**: POST
+
+- **Sample POST Request Body and Sample API response**:
+
+  -  **Prequisities**:
+    1. Client id: This corresponds to the id generated when we first created a new Doorkeeper application with the `rake db:seed` command.
+    It's value can be obtained with the command `Doorkeeper::Application.first.uid` specified in Rails console
+
+    2. Client secret: This corresponds to the secret generated when we first created a new Doorkeeper application with the `rake db:seed` command.
+    It's value can be obtained with the command `Doorkeeper::Application.first.secret` specified in Rails console
+
+    3. Token: This corresponds to the value of the access token obtained from the Sign up API, Login API or Refresh token API specified above.
+
+    4. Additional setup: Other than these attributes, we also need to set Authorization header for the HTTP request to use `Basic Auth`, using client_id` value for the `username` and `client_password` value for the `password`.
+
+
+  - **Sample API POST Request body for User Logout API**:
+
+      * One can see how to specify the POST request params via using `form-data` option in an API client like `Postman` [here](./spec/fixtures/files/user_logout_api_request_form_data_setup.png)
+
+      * One can see how to set Authorization header for the HTTP request to use `Basic Auth` along with specifying values of `client_id` & `client_secret` which correspond to `username` & `password` values respectively in an API client like `Postman` [here](./spec/fixtures/files/user_logout_api_request_other_setup_part.png)
+
+  - **Sample API response for User Logout API**:
+
+    ```
+    {
+
+    }
+    ```
+
+
+- **How do we know the API request succeeded?**: After revoking a token, the token record will have a `revoked_at` column filled with a relevant timestamp value.
+
+    *  One can cross verify this with the command: ` Doorkeeper::AccessToken.find_by(token: '1mfjNrMo_Lzw-XCrksjNUiNRAAx6ht4y6zMBwFOwmo8')` . Here `1mfjNrMo_Lzw-XCrksjNUiNRAAx6ht4y6zMBwFOwmo8` corresponds to a sample token that's specified as part of prerequisite 3. above
+
+
+#### 5. Example of accessing a Protected API using the access token generated from 1. or 2. above
 
   - **Sample API URL**: GET `http://localhost:3000/api/v1/customers` (API to list customers)
 
