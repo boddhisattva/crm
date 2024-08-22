@@ -4,9 +4,11 @@
 
 API Backend for the CRM Service
 
-## Code related design decisions
+## Note on some handy code related gems used
 - Have made use of the `oj` gem as its fast JSON parse & serializer
 - Have made use of Doorkeeper gem to provide Oauth capabilities
+- Gems like `bullet` have been used to proactively look out for N+1 Queries
+- Other gems like `brakeman`, `strong_migrations`, `flog`, `fasterer` and various `rubocop` gems are added for writing more secure, better quality code and for performance and consistent code formatting purposes
 
 ## Areas of Improvement
 - One can add Rate limiting capabilities
@@ -18,6 +20,14 @@ API Backend for the CRM Service
 
 ### Dependencies
 * Ruby 3.3.0, Rails 7.1.3.4
+* App is configured to use Postgres DB and has been tested with Postgres v14
+  * To install Postgres
+    * On Mac: https://postgresapp.com/ is a good option
+    * On other Operating Systems: Please refer official Postgres guides [here](https://www.postgresql.org/download/)
+* Image uploads is implemented with [Rails Active storage](https://guides.rubyonrails.org/active_storage_overview.html) and one might need to setup a relevant image processing library for image management
+  * For this app we've chosen `libvips` as the image processing library. To set it up:
+    * Mac: If you use homebrew, one could setup `libvips` via the command: `brew install vips`
+    * On other Operating Systems: Please refer to the section [here](https://guides.rubyonrails.org/active_storage_overview.html#requirements)
 * Please refer to the Gemfile for the other dependencies
 
 ### Basic App Setup
@@ -138,7 +148,7 @@ From the project root directory:
     }
     ```
 
-- **Accessing Protected app API's**:
+- 3. **Accessing Protected app API's**:
   *  Upon successfully running the above API
       * The resulting `access_token` that is generated from the API call(as shown in the sample response above) can be used to call the apps protected API's
 
@@ -151,7 +161,6 @@ From the project root directory:
     `Bearer Msm_qAlBOZGSt_T0oMp9lj5mGqglBouoDb86rFkWMXQ`
 
   - One can see how to call the above API with the `Authorization` field filled with the Bearer token as part of the Headers section in an API client like `Postman` [here](./spec/fixtures/files/sample_api_call.png)
-
 
 ### How to test Image uploads are working in development
 
