@@ -235,7 +235,7 @@ From the project root directory:
     *  One can cross verify this with the command: ` Doorkeeper::AccessToken.find_by(token: '1mfjNrMo_Lzw-XCrksjNUiNRAAx6ht4y6zMBwFOwmo8')` . Here `1mfjNrMo_Lzw-XCrksjNUiNRAAx6ht4y6zMBwFOwmo8` corresponds to a sample token that's specified as part of prerequisite 3. above
 
 
-#### 5. Example of accessing a Protected API using the access token generated from 1. or 2. above
+#### 5. Example of accessing a Protected API using the access token generated from 1. or 2. or 3. above
 
   - **Sample API URL**: GET `http://localhost:3000/api/v1/customers` (API to list customers)
 
