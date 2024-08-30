@@ -13,11 +13,3 @@ namespace :api do
     resources :customers, only: %i[destroy update show create index]
   end
 end
-
-scope :api do
-  scope :v1 do
-    use_doorkeeper do
-      skip_controllers :authorizations, :applications, :authorized_applications
-    end
-  end
-end
