@@ -37,4 +37,34 @@ RSpec.describe Customer, type: :model do
       end
     end
   end
+
+  describe 'validations' do
+    context 'when given a customer identifier' do
+      let(:customer) { create(:customer) }
+
+      context 'when we try creating a new customer with the same identifier used by an existing customer' do
+        let(:other_customer) { build(:customer, identifier: customer.identifier) }
+
+        it 'treats the new customer as invalid and does not allow creating a new customer' do
+          expect(other_customer).not_to be_valid
+        end
+      end
+
+      context 'when we try creating a new customer with an upcased version of an existing customer\'s identifier' do
+        let(:other_customer) { build(:customer, identifier: customer.identifier.upcase) }
+
+        it 'treats the new customer as invalid and doesn\'t allow its creation as the identifier is case insensitive' do
+          expect(other_customer).not_to be_valid
+        end
+      end
+
+      context 'when we try creating a new customer with a new identifier' do
+        let(:other_customer) { build(:customer) }
+
+        it 'treats the new customer as valid and it allows new customer creation' do
+          expect(other_customer).to be_valid
+        end
+      end
+    end
+  end
 end
