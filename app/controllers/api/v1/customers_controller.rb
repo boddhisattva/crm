@@ -73,7 +73,7 @@ module API
         end
 
         def require_all_customer_params
-          required_customer_params = %w[name surname photo identifier]
+          required_customer_params = %w[name surname identifier]
           customer_params_keys = customer_params.keys
 
           return if required_customer_params.all? { |required_param| customer_params_keys.include?(required_param) }

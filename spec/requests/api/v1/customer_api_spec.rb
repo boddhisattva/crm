@@ -58,26 +58,57 @@ RSpec.describe 'Customer API specs', type: :request do
     end
 
     context 'with valid params' do
-      it 'creates a new customer' do
-        expect do
-          post '/api/v1/customers', params: new_customer_params,
-                                    headers: { 'Authorization': "Bearer #{token.token}" }
-        end.to change(Customer, :count).from(0).to(1)
-           .and change(ActiveStorage::Blob, :count).from(0).to(1)
+      context 'when photo is present' do
+        it 'creates a new customer' do
+          expect do
+            post '/api/v1/customers', params: new_customer_params,
+                                      headers: { 'Authorization': "Bearer #{token.token}" }
+          end.to change(Customer, :count).from(0).to(1)
+             .and change(ActiveStorage::Blob, :count).from(0).to(1)
 
-        latest_uploaded_image = ActiveStorage::Blob.last
+          latest_uploaded_image = ActiveStorage::Blob.last
 
-        expect(latest_uploaded_image.filename).to eq(photo_name)
+          expect(latest_uploaded_image.filename).to eq(photo_name)
 
-        parsed_response_body = JSON.parse(response.body)
-        expect(parsed_response_body['name']).to eq('Fiona')
-        expect(parsed_response_body['surname']).to eq('Rainer')
-        expect(parsed_response_body['created_by_id']).to eq(user1.id)
-        expect(parsed_response_body['last_modified_by_id']).to eq(user1.id)
-        expect(parsed_response_body['identifier']).to eq(new_customer_identifier)
-        expect(parsed_response_body['photo_url']).to include(photo_name)
+          parsed_response_body = JSON.parse(response.body)
+          expect(parsed_response_body['name']).to eq('Fiona')
+          expect(parsed_response_body['surname']).to eq('Rainer')
+          expect(parsed_response_body['created_by_id']).to eq(user1.id)
+          expect(parsed_response_body['last_modified_by_id']).to eq(user1.id)
+          expect(parsed_response_body['identifier']).to eq(new_customer_identifier)
+          expect(parsed_response_body['photo_url']).to include(photo_name)
 
-        expect(response).to have_http_status(:created)
+          expect(response).to have_http_status(:created)
+        end
+      end
+
+      context 'when photo is not present' do
+        let(:new_customer_params) do
+          {
+            'customer':
+            {
+              'name': 'Fiona',
+              'surname': 'Rainer',
+              'identifier': new_customer_identifier
+            }
+          }
+        end
+
+        it 'creates a new customer' do
+          expect do
+            post '/api/v1/customers', params: new_customer_params,
+                                      headers: { 'Authorization': "Bearer #{token.token}" }
+          end.to change(Customer, :count).from(0).to(1)
+
+          parsed_response_body = JSON.parse(response.body)
+          expect(parsed_response_body['name']).to eq('Fiona')
+          expect(parsed_response_body['surname']).to eq('Rainer')
+          expect(parsed_response_body['created_by_id']).to eq(user1.id)
+          expect(parsed_response_body['last_modified_by_id']).to eq(user1.id)
+          expect(parsed_response_body['identifier']).to eq(new_customer_identifier)
+
+          expect(response).to have_http_status(:created)
+        end
       end
     end
 
