@@ -15,6 +15,8 @@ class Customer < ApplicationRecord
                     dimension: { width: { max: 4000 },
                                  height: { max: 6000 }, message: 'is not given between dimension' }
 
+  validates :identifier, uniqueness: { case_sensitive: false }
+
   def photo_url
     Rails.application.routes.url_helpers.url_for(photo) if photo.attached?
   end
