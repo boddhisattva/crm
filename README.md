@@ -2,7 +2,8 @@
 
 ## About
 
-API Backend for the CRM Service
+API Backend for the CRM Service. One can find the detailed problem statement [here](https://github.com/boddhisattva/crm/blob/main/problem_statement.md).
+
 
 ## Note on some handy code related gems used
 - Have made use of the `oj` gem as its fast JSON parse & serializer
