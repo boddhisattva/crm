@@ -1,4 +1,4 @@
-# CRM Service (problem statement markdown converted to PDF version of the project)
+# CRM Service
 
 You need to build a synthetic API project. The objective is to create a REST API to manage customer data for a small shop. It will work as the backend side for a CRM interface that is being developed by a different team. You’re in charge of the API design and implementation. Here are the requirements for the API:
 
