@@ -73,7 +73,7 @@ From the project root directory:
 
 - **Sample POST Request Body and Sample API response**:
 
-  -  **Prequisities**:
+  -  **Prerequisites**:
     1. `client_id`: This corresponds to the id generated when we first created a new Doorkeeper application with the `rake db:seed` command mentioned above.
       a. It's value can be obtained with the command `Doorkeeper::Application.first.uid` specified in Rails console
 
@@ -122,7 +122,7 @@ From the project root directory:
 
 - **Sample POST Request Body and Sample API response**:
 
-  -  **Prequisities**:
+  -  **Prerequisites**:
     1. `client_id`: This corresponds to the id generated when we first created a new Doorkeeper application with the `rake db:seed` command.
     It's value can be obtained with the command `Doorkeeper::Application.first.uid` specified in Rails console
 
@@ -163,7 +163,7 @@ From the project root directory:
 
 - **Sample POST Request Body and Sample API response**:
 
-  -  **Prequisities**:
+  -  **Prerequisites**:
     1. `client_id`: This corresponds to the id generated when we first created a new Doorkeeper application with the `rake db:seed` command.
     It's value can be obtained with the command `Doorkeeper::Application.first.uid` specified in Rails console
 
@@ -204,7 +204,7 @@ From the project root directory:
 
 - **Sample POST Request Body and Sample API response**:
 
-  -  **Prequisities**:
+  -  **Prerequisites**:
     1. `client_id`: This corresponds to the id generated when we first created a new Doorkeeper application with the `rake db:seed` command.
     It's value can be obtained with the command `Doorkeeper::Application.first.uid` specified in Rails console
 
@@ -241,7 +241,7 @@ From the project root directory:
 
   - **Sample API URL**: GET `http://localhost:3000/api/v1/customers` (API to list customers)
 
-  -  **Prequisities**:
+  -  **Prerequisites**:
     1. Access token: We need to specify the access token in the Headers section using it against a field named `Authorization` as per the below format:
     `Bearer Msm_qAlBOZGSt_T0oMp9lj5mGqglBouoDb86rFkWMXQ`
 
