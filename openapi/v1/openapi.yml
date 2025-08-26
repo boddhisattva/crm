@@ -1,0 +1,127 @@
+---
+openapi: 3.0.1
+info:
+  title: CRM API V1
+  version: v1
+  description: Customer Relationship Management API Documentation
+paths:
+  "/api/v1/users":
+    post:
+      summary: Register a new user
+      tags:
+      - User Registration
+      description: Creates a new user account with the provided credentials and OAuth
+        client ID
+      parameters: []
+      responses:
+        '200':
+          description: successful registration
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    id: 1
+                    email: user2@example.com
+                    role: user
+                    access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                    token_type: Bearer
+                    expires_in: 7200
+                    refresh_token: refresh_token_example
+                    created_at: 1234567890
+              schema:
+                "$ref": "#/components/schemas/RegistrationResponse"
+        '401':
+          description: unauthorized - invalid client
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    error: Client authentication failed due to unknown client, no
+                      client authentication included, or unsupported authentication
+                      method.
+              schema:
+                "$ref": "#/components/schemas/Error"
+        '422':
+          description: unprocessable entity - validation errors
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    errors:
+                      email:
+                      - is invalid
+              schema:
+                "$ref": "#/components/schemas/Error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/RegistrationInput"
+servers:
+- url: http://localhost:3000
+  description: Development server
+- url: https://{defaultHost}
+  variables:
+    defaultHost:
+      default: www.example.com
+components:
+  schemas:
+    RegistrationInput:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: newuser@example.com
+        password:
+          type: string
+          format: password
+          minLength: 6
+          example: password123
+        client_id:
+          type: string
+          example: your_client_id_here
+      required:
+      - email
+      - password
+      - client_id
+    RegistrationResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum:
+          - user
+          - admin
+        access_token:
+          type: string
+        token_type:
+          type: string
+          example: Bearer
+        expires_in:
+          type: integer
+          example: 7200
+        refresh_token:
+          type: string
+        created_at:
+          type: integer
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
