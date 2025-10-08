@@ -1,0 +1,290 @@
+---
+openapi: 3.0.1
+info:
+  title: CRM API V1
+  version: v1
+  description: Customer Relationship Management API Documentation
+paths:
+  "/api/v1/customers/{customer_id}":
+    parameters:
+    - name: customer_id
+      in: path
+      description: Customer ID
+      required: true
+      schema:
+        type: integer
+    put:
+      summary: Update customer
+      tags:
+      - Customers
+      description: Updates an existing customer record with new data and file uploads
+      parameters:
+      - name: Authorization
+        in: header
+        type: string
+        required: true
+        description: Bearer token for authentication
+        schema:
+          type: string
+          pattern: "^Bearer .+"
+      - name: customer_id
+        in: path
+        required: true
+        description: Customer ID
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: successful update
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    id: 1
+                    name: John
+                    surname: Rainer
+                    identifier: 01234567-89ab-cdef-0123-456789abcdef
+                    photo_url: http://localhost:3000/rails/active_storage/blobs/faith_can_move_mountains_rachel_unsplash.jpg
+                    created_by_id: 1
+                    last_modified_by_id: 2
+                    created_at: '2024-01-01T10:00:00Z'
+                    updated_at: '2024-01-01T11:00:00Z'
+              schema:
+                "$ref": "#/components/schemas/Customer"
+        '404':
+          description: customer not found
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    errors: No customer found with the specified id
+              schema:
+                "$ref": "#/components/schemas/Error"
+        '422':
+          description: unprocessable entity - validation errors
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    errors:
+                      identifier:
+                      - can't be blank
+              schema:
+                "$ref": "#/components/schemas/Error"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                customer[name]:
+                  type: string
+                  description: Customer first name
+                  example: Jane
+                customer[surname]:
+                  type: string
+                  description: Customer last name
+                  example: Smith
+                customer[identifier]:
+                  type: string
+                  format: uuid
+                  description: Customer UUID identifier
+                  example: 01234567-89ab-cdef-0123-456789abcdef
+                customer[photo]:
+                  type: string
+                  format: binary
+                  description: Customer photo file
+  "/api/v1/users":
+    post:
+      summary: Register a new user
+      tags:
+      - User Registration
+      description: Creates a new user account with the provided credentials and OAuth
+        client ID
+      parameters: []
+      responses:
+        '200':
+          description: successful registration
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    id: 1
+                    email: user2@example.com
+                    role: user
+                    access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                    token_type: Bearer
+                    expires_in: 7200
+                    refresh_token: refresh_token_example
+                    created_at: 1234567890
+              schema:
+                "$ref": "#/components/schemas/RegistrationResponse"
+        '401':
+          description: unauthorized - invalid client
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    error: Client authentication failed due to unknown client, no
+                      client authentication included, or unsupported authentication
+                      method.
+              schema:
+                "$ref": "#/components/schemas/Error"
+        '422':
+          description: unprocessable entity - validation errors
+          content:
+            application/json:
+              examples:
+                example_0:
+                  value:
+                    errors:
+                      email:
+                      - is invalid
+              schema:
+                "$ref": "#/components/schemas/Error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/RegistrationInput"
+servers:
+- url: http://localhost:3000
+  description: Development server
+- url: https://{defaultHost}
+  variables:
+    defaultHost:
+      default: www.example.com
+components:
+  schemas:
+    RegistrationInput:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: newuser@example.com
+        password:
+          type: string
+          format: password
+          minLength: 6
+          example: password123
+        client_id:
+          type: string
+          example: your_client_id_here
+      required:
+      - email
+      - password
+      - client_id
+    RegistrationResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum:
+          - user
+          - admin
+        access_token:
+          type: string
+        token_type:
+          type: string
+          example: Bearer
+        expires_in:
+          type: integer
+          example: 7200
+        refresh_token:
+          type: string
+        created_at:
+          type: integer
+    Customer:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: John
+        surname:
+          type: string
+          example: Doe
+        photo:
+          nullable: true
+        identifier:
+          type: string
+          format: uuid
+          example: 01234567-89ab-cdef-0123-456789abcdef
+        photo_url:
+          type: string
+          format: uri
+          nullable: true
+          example: http://example.com/photo.jpg
+        created_by_id:
+          type: integer
+          example: 1
+        last_modified_by_id:
+          type: integer
+          example: 2
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - name
+      - surname
+      - identifier
+      - created_by_id
+      - last_modified_by_id
+      - created_at
+      - updated_at
+    CustomerUpdateInput:
+      type: object
+      properties:
+        customer:
+          type: object
+          properties:
+            name:
+              type: string
+              example: Jane
+              description: Customer first name
+            surname:
+              type: string
+              example: Smith
+              description: Customer last name
+            identifier:
+              type: string
+              format: uuid
+              example: 01234567-89ab-cdef-0123-456789abcdef
+              description: Unique customer identifier
+            photo:
+              type: string
+              format: binary
+              description: Customer photo file
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        errors:
+          oneOf:
+          - type: string
+          - type: object
+            additionalProperties:
+              type: array
+              items:
+                type: string

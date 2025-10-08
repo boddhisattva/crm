@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require 'swagger_helper'
 
 RSpec.describe 'Customer API specs', type: :request do
   let(:user1) { create(:user) }
@@ -226,98 +226,144 @@ RSpec.describe 'Customer API specs', type: :request do
     end
   end
 
-  describe 'PUT /api/v1/customers/:customer_id' do
-    context 'when customer exists' do
-      let(:customer) { create(:customer, created_by: user1) }
-      let(:photo) { fixture_file_upload('faith_can_move_mountains_rachel_unsplash.jpg') }
-      let(:user2) { create(:user) }
-      let(:token) { create :access_token, application: create(:application), resource_owner_id: user2.id }
-      let(:new_customer_identifier) { SecureRandom.uuid_v7 }
-      let(:update_customer_params) do
-        {
-          'customer': {
-            'surname': 'Rainer',
-            'photo': photo,
-            'identifier': new_customer_identifier
+  path '/api/v1/customers/{customer_id}' do
+    parameter name: :customer_id, in: :path, type: :integer, description: 'Customer ID', required: true
+
+    put('Update customer') do
+      tags 'Customers'
+      consumes 'multipart/form-data'
+      produces 'application/json'
+      description 'Updates an existing customer record with new data and file uploads'
+
+      parameter name: :Authorization, in: :header, type: :string, required: true,
+                description: 'Bearer token for authentication',
+                schema: { type: :string, pattern: '^Bearer .+' }
+
+      parameter name: :customer_id, in: :path, type: :integer, required: true, description: 'Customer ID'
+
+      parameter name: 'customer[name]', in: :formData, type: :string, required: false,
+                description: 'Customer first name'
+      parameter name: 'customer[surname]', in: :formData, type: :string, required: false,
+                description: 'Customer last name'
+      parameter name: 'customer[identifier]', in: :formData, type: :string, required: false,
+                description: 'Customer UUID'
+      parameter name: 'customer[photo]', in: :formData, type: :string, format: :binary, required: false,
+                description: 'Customer photo file'
+
+      context 'when customer exists' do
+        response(200, 'successful update') do
+          let(:customer) { create(:customer, created_by: user1) }
+          let(:photo) { fixture_file_upload('faith_can_move_mountains_rachel_unsplash.jpg') }
+          let(:user2) { create(:user) }
+          let(:token) { create :access_token, application: create(:application), resource_owner_id: user2.id }
+          let(:new_customer_identifier) { SecureRandom.uuid_v7 }
+          let(:customer_id) { customer.id }
+          let(:Authorization) { "Bearer #{token.token}" }
+          let(:'customer[surname]') { 'Rainer' }
+          let(:'customer[photo]') { photo }
+          let(:'customer[identifier]') { new_customer_identifier }
+
+          schema '$ref' => '#/components/schemas/Customer'
+
+          examples 'application/json' => {
+            id: 1,
+            name: 'John',
+            surname: 'Rainer',
+            identifier: '01234567-89ab-cdef-0123-456789abcdef',
+            photo_url: 'http://localhost:3000/rails/active_storage/blobs/faith_can_move_mountains_rachel_unsplash.jpg',
+            created_by_id: 1,
+            last_modified_by_id: 2,
+            created_at: '2024-01-01T10:00:00Z',
+            updated_at: '2024-01-01T11:00:00Z'
           }
-        }
+
+          before { customer }
+
+          it 'updates the customer record & updates the last_modified_by user id for the same' do |example|
+            expect(customer.last_modified_by_id).to eq(user1.id)
+
+            submit_request(example.metadata)
+            assert_response_matches_metadata(example.metadata)
+
+            expect(response).to have_http_status(:ok)
+
+            parsed_response_body = JSON.parse(response.body)
+            expect(customer.reload.last_modified_by_id).to eq(user2.id)
+            expect(parsed_response_body['surname']).to eq('Rainer')
+            expect(parsed_response_body['photo_url']).to include('faith_can_move_mountains_rachel_unsplash.jpg')
+            expect(parsed_response_body['identifier']).to eq(new_customer_identifier)
+          end
+        end
       end
 
-      before { customer }
+      context 'when customer does not exist (soft deleted customer)' do
+        response(404, 'customer not found') do
+          let(:customer) { create(:customer, created_by: user1) }
+          let(:photo) { fixture_file_upload('faith_can_move_mountains_rachel_unsplash.jpg') }
+          let(:user2) { create(:user) }
+          let(:token) { create :access_token, application: create(:application), resource_owner_id: user2.id }
+          let(:new_customer_identifier) { SecureRandom.uuid_v7 }
+          let(:customer_id) { customer.id }
+          let(:Authorization) { "Bearer #{token.token}" }
+          let(:'customer[surname]') { 'Rainer' }
+          let(:'customer[photo]') { photo }
+          let(:'customer[identifier]') { new_customer_identifier }
 
-      it 'updates the customer record & updates the last_modified_by user id f for the same' do
-        expect(customer.last_modified_by_id).to eq(user1.id)
+          schema '$ref' => '#/components/schemas/Error'
 
-        put "/api/v1/customers/#{customer.id}", params: update_customer_params,
-                                                headers: { 'Authorization': "Bearer #{token.token}" }
-
-        parsed_response_body = JSON.parse(response.body)
-
-        expect(customer.reload.last_modified_by_id).to eq(user2.id)
-        expect(parsed_response_body['surname']).to eq('Rainer')
-        expect(parsed_response_body['photo_url']).to include('faith_can_move_mountains_rachel_unsplash.jpg')
-        expect(parsed_response_body['identifier']).to eq(new_customer_identifier)
-        expect(response).to have_http_status(:ok)
-      end
-    end
-
-    context 'when customer does not exist(example: soft deleted customer)' do
-      let(:customer) { create(:customer, created_by: user1) }
-      let(:photo) { fixture_file_upload('faith_can_move_mountains_rachel_unsplash.jpg') }
-      let(:user2) { create(:user) }
-      let(:token) { create :access_token, application: create(:application), resource_owner_id: user2.id }
-      let(:new_customer_identifier) { SecureRandom.uuid_v7 }
-      let(:update_customer_params) do
-        {
-          'customer': {
-            'surname': 'Rainer',
-            'photo': photo,
-            'identifier': new_customer_identifier
+          examples 'application/json' => {
+            errors: 'No customer found with the specified id'
           }
-        }
+
+          before do
+            customer.destroy # soft delete the customer
+          end
+
+          it 'returns an appropriate customer not found error message & not found status code' do |example|
+            submit_request(example.metadata)
+            assert_response_matches_metadata(example.metadata)
+
+            expect(response).to have_http_status(:not_found)
+
+            parsed_response_body = JSON.parse(response.body)
+            expect(parsed_response_body['errors']).to eq('No customer found with the specified id')
+          end
+        end
       end
 
-      before do
-        customer.destroy # soft delete the customer
-      end
+      context 'when invalid update params are provided' do
+        response(422, 'unprocessable entity - validation errors') do
+          let(:customer) { create(:customer, created_by: user1) }
+          let(:photo) { fixture_file_upload('faith_can_move_mountains_rachel_unsplash.jpg') }
+          let(:user2) { create(:user) }
+          let(:token) { create :access_token, application: create(:application), resource_owner_id: user2.id }
+          let(:new_customer_identifier) { 'a random invalid UUID' }
+          let(:customer_id) { customer.id }
+          let(:Authorization) { "Bearer #{token.token}" }
+          let(:'customer[surname]') { 'Rainer' }
+          let(:'customer[photo]') { photo }
+          let(:'customer[identifier]') { new_customer_identifier }
 
-      it 'returns an appropriate customer not found error message & not found status code' do
-        put "/api/v1/customers/#{customer.id}", params: update_customer_params,
-                                                headers: { 'Authorization': "Bearer #{token.token}" }
+          schema '$ref' => '#/components/schemas/Error'
 
-        parsed_response_body = JSON.parse(response.body)
-
-        expect(parsed_response_body['errors']).to eq('No customer found with the specified id')
-        expect(response).to have_http_status(:not_found)
-      end
-    end
-
-    context 'when we have one or more invalid update customer params - example invalid identifier passed' do
-      let(:customer) { create(:customer, created_by: user1) }
-      let(:photo) { fixture_file_upload('faith_can_move_mountains_rachel_unsplash.jpg') }
-      let(:user2) { create(:user) }
-      let(:token) { create :access_token, application: create(:application), resource_owner_id: user2.id }
-      let(:new_customer_identifier) { 'a random invalid UUID' }
-      let(:update_customer_params) do
-        {
-          'customer': {
-            'surname': 'Rainer',
-            'photo': photo,
-            'identifier': new_customer_identifier
+          examples 'application/json' => {
+            errors: {
+              identifier: ["can't be blank"]
+            }
           }
-        }
-      end
 
-      before { customer }
+          before { customer }
 
-      it 'returns an appropriate customer not found error message & not found status code' do
-        put "/api/v1/customers/#{customer.id}", params: update_customer_params,
-                                                headers: { 'Authorization': "Bearer #{token.token}" }
+          it 'returns validation errors for invalid identifier' do |example|
+            submit_request(example.metadata)
+            assert_response_matches_metadata(example.metadata)
 
-        parsed_response_body = JSON.parse(response.body)
+            expect(response).to have_http_status(:unprocessable_entity)
 
-        expect(parsed_response_body['errors']).to eq({ 'identifier' => ["can't be blank"] })
-        expect(response).to have_http_status(:unprocessable_entity)
+            parsed_response_body = JSON.parse(response.body)
+            expect(parsed_response_body['errors']).to eq({ 'identifier' => ["can't be blank"] })
+          end
+        end
       end
     end
   end

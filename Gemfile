@@ -62,6 +62,7 @@ group :development, :test do
   gem 'rubocop-rspec_rails', require: false # RSpec Rails-specific analysis for one's projects
   gem 'shoulda-matchers' # Simple One-Liner Tests for Rails
   gem 'strong_migrations' # Catch unsafe migrations in development
+  gem 'rswag-specs' # Generate Swagger documentation from RSpec examples
 end
 
 group :development do
@@ -92,3 +93,7 @@ gem 'paranoia', '~> 3.0' # Allows soft deletion capabilities
 gem 'active_storage_validations', '~> 1.1', '>= 1.1.4' # Validations for active storage
 
 gem 'oj', '~> 3.16', '>= 3.16.5' # A fast JSON parse and serializer
+
+# Gemfile
+gem 'rswag-api'
+gem 'rswag-ui'
