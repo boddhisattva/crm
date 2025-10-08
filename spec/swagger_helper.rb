@@ -66,17 +66,57 @@ RSpec.configure do |config|
             }
           },
 
+          # Customer Schema
+          Customer: {
+            type: :object,
+            additionalProperties: false,
+            properties: {
+              id: { type: :integer, example: 1 },
+              name: { type: :string, example: 'John' },
+              surname: { type: :string, example: 'Doe' },
+              photo: { nullable: true },
+              identifier: { type: :string, format: :uuid, example: '01234567-89ab-cdef-0123-456789abcdef' },
+              photo_url: { type: :string, format: :uri, nullable: true, example: 'http://example.com/photo.jpg' },
+              created_by_id: { type: :integer, example: 1 },
+              last_modified_by_id: { type: :integer, example: 2 },
+              created_at: { type: :string, format: 'date-time' },
+              updated_at: { type: :string, format: 'date-time' }
+            },
+            required: %w[id name surname identifier created_by_id last_modified_by_id created_at updated_at]
+          },
+
+          # Customer Update Input Schema (multipart/form-data)
+          CustomerUpdateInput: {
+            type: :object,
+            properties: {
+              customer: {
+                type: :object,
+                properties: {
+                  name: { type: :string, example: 'Jane', description: 'Customer first name' },
+                  surname: { type: :string, example: 'Smith', description: 'Customer last name' },
+                  identifier: { type: :string, format: :uuid, example: '01234567-89ab-cdef-0123-456789abcdef', description: 'Unique customer identifier' },
+                  photo: { type: :string, format: :binary, description: 'Customer photo file' }
+                }
+              }
+            }
+          },
+
           # Error Schema
           Error: {
             type: :object,
             properties: {
               error: { type: :string },
               errors: {
-                type: :object,
-                additionalProperties: {
-                  type: :array,
-                  items: { type: :string }
-                }
+                oneOf: [
+                  { type: :string },
+                  {
+                    type: :object,
+                    additionalProperties: {
+                      type: :array,
+                      items: { type: :string }
+                    }
+                  }
+                ]
               }
             }
           }
